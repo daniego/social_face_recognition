@@ -1,13 +1,15 @@
 import face_recognition
 import cv2
 import numpy as np
-import os
+from os import mkdir, path, listdir, system
+import uuid
+
 
 # Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(0)
 
 # Load a second sample picture and learn how to recognize it.
-dir_path = os.path.dirname(os.path.realpath(__file__))
+dir_path = path.dirname(path.realpath(__file__))
 Linus_Torvalds_image = face_recognition.load_image_file(dir_path + "/faces/Linus_Torvalds.jpg")
 Linus_Torvalds_encoding = face_recognition.face_encodings(Linus_Torvalds_image)[0]
 
@@ -23,13 +25,50 @@ known_face_names = [
 face_locations = []
 face_encodings = []
 face_names = []
-# known_face_encodings = ['s']
+
 faces_acquired = []
 process_this_frame = True
 
 frame_red = 0, 0, 255
 frame_green = 0, 255, 0
 frame_blue = 255, 0, 0
+
+# Create target Directory
+acquired_faces_path = path.join(dir_path, "acquired_faces")
+try:
+    mkdir(acquired_faces_path)
+    print("[INFO] Created acquired faces directory")
+except FileExistsError:
+    print("[INFO] Acquired faces directory already exists... SKIPPING")
+
+def save_data(face_encoding, name):
+    known_face_encodings.append(face_encoding)
+    known_face_names.append(name)
+    faces_acquired.append(face_encoding)
+
+    filename = path.join(acquired_faces_path, name)+".jpg"
+    cv2.imwrite(filename, frame)
+
+def preload_data(acquired_faces_path):
+    faces = []
+    names = []
+    for face in listdir(acquired_faces_path):
+        face_path = path.join(acquired_faces_path, face)
+        if path.isfile(face_path):
+
+            name = path.splitext(face)
+            print('1')
+            face_image = face_recognition.load_image_file(face_path)
+            print('2')
+            face_encoding = face_recognition.face_encodings(face_image)[0]
+            faces.append(face_encoding)
+            names.append(name[0])
+
+    return faces, names
+
+preload_data = preload_data(acquired_faces_path)
+[known_face_encodings.append(name) for name in preload_data[0]]
+[known_face_names.append(name) for name in preload_data[1]]
 
 while True:
     # Grab a single frame of video
@@ -48,6 +87,8 @@ while True:
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
         face_names = []
+        # print([i[0] for i in known_face_encodings])
+
         for face_encoding in face_encodings:
 
             name = "Unknown"
@@ -55,46 +96,26 @@ while True:
 
             # See if the face is a match for the known face(s)
             matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-            print('matches',matches)
-            # name = face_locations
-            # print(face_encoding)
-            # # If a match was found in known_face_encodings, just use the first one.
-            # if True in matches:
-            #     first_match_index = matches.index(True)
-            #     name = known_face_names[first_match_index]
 
-            # Or instead, use the known face with the smallest distance to the new face
+            # Use the known face with the smallest distance to the new face
             face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
             best_match_index = np.argmin(face_distances)
-            # print('best_match_index',best_match_index)
 
-            # print(known_face_encodings)
-
-            # if matches[best_match_index]:
             if matches[best_match_index]:
+                name = known_face_names[best_match_index]
                 frame_color = frame_green
-                # name = known_face_names[best_match_index]
-                name = "Known face"
-                # print('Is matches')
 
-                # if face_encoding in faces_acquired:
-                # if face_encoding in np.any(faces_acquired):
-                # if np.any(faces_acquired, face_encoding): # TypeError: only integer scalar arrays can be converted to a scalar index
                 if face_recognition.compare_faces(faces_acquired, face_encoding):
                     frame_color = frame_blue
-                    name = "Face acquired"
             else:
                 # Face not recognized
-                # Adding face to known faces
-                print('Acquiring face')
-                known_face_encodings.append(face_encoding)
-                faces_acquired.append(face_encoding)
-                frame_color = frame_blue
-                name = "Face acquired"
+                print('[INFO] Acquiring face')
+                name = str(uuid.uuid1())
+                frame_color = frame_red
+                save_data(face_encoding, name)
+
             face_names.append(name)
-            # print('known_face_encodings', len(known_face_encodings))
-            # print('faces_acquired', len(faces_acquired))
-            # print
+
     process_this_frame = not process_this_frame
 
 
@@ -118,7 +139,7 @@ while True:
     # cv2.namedWindow('Video', frame)
     cv2.imshow('Video', frame)
     cv2.moveWindow('Video', 20, 20)
-    os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "python" to true' ''') # To make window active
+    system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "python" to true' ''') # To make window active
 
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
