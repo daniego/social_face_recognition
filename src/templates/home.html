@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+
+        <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.css') }}">
+        <script src="{{ url_for('static', filename='js/jquery-1.12.4.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/jquery-ui-1.12.1.js') }}"></script> -->
+
+        <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+
+        <!-- Place favicon.ico in the root directory -->
+
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+        <div class="jumbotron">
+          <div class="container">
+            <h1>Social Face Recognition</h1>
+            <p>Hello world! Welcome to my internet thing!</p>
+          </div>
+        </div>
+
+        <div class="container">
+          <div class="row">
+            <div class="col-md-4">
+              <!-- <button class="btn btn-default" type='button' id='view_up'>Start</button>
+              <button class="btn btn-default" type='button' id='view_up'>Stop</button> -->
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <!-- <button type="button" class="btn btn-success" onclick="start_recognition">Start</button> -->
+                <button type="button" class="btn btn-success" id="start_recognition">Start</button>
+                <button type="button" class="btn btn-danger" id="stop_recognition">Stop</button>
+
+                <!-- <p>First Paragraph</p>
+<p>Second Paragraph</p>
+<p>Yet one more Paragraph</p> -->
+                <!-- <button type="button" class="btn btn-primary">Right</button> -->
+              </div>
+              <h3>Switch: <span id='switch_value' class="label"></span></h3>
+            </div>
+            <div class="col-md-4">
+              <h3>LED</h3>
+
+            </div>
+            <div class="col-md-4">
+
+            </div>
+          </div>
+        </div>
+
+        <script>
+
+
+        $('#start_recognition').click(function() {
+          $.get('/v1/face_recognition/start')
+        });
+
+        $('#stop_recognition').click(function() {
+          $.get('/v1/face_recognition/stop')
+        });
+
+
+          // $(document).ready(function() {
+          //
+          //   function start_recognition(){
+          //     console.log('aaa start_recognition')
+          //   }
+          //   // Setup control directions
+          //   $('#start_recognition').click(function() {
+          //     console.console.log('start_recognition');
+          //     // $.post('/control/direction/forward');
+          //   });
+          // });
+        </script>
+
+    </body>
+</html>
