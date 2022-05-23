@@ -104,3 +104,7 @@ venv.bak/
 .mypy_cache/
 
 **/acquired_faces
+
+# loca data
+esdata
+local_setting.py
