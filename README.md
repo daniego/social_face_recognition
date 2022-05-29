@@ -26,6 +26,7 @@ docker run -p 9200:9200 -p 9300:9300 \
 -e "cluster.routing.allocation.disk.watermark.low=30mb" \
 -e "cluster.routing.allocation.disk.watermark.high=20mb" \
 -e "cluster.routing.allocation.disk.watermark.flood_stage=10mb" \
+-e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
 -v ${PWD}/esdata:/usr/share/elasticsearch/data \
 --name es_face \
 -d docker.elastic.co/elasticsearch/elasticsearch:7.16.0
